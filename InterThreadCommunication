@@ -1,0 +1,82 @@
+package com.pankaj.practice;
+
+// This programs prints 1-100 numbers in sequence, but they are actually written by two functions : odd and even, both are sync in a way which 
+// that end user doesn't get an idea that two programs are printing these numbers....
+
+public class InterThreadCommunication {
+ 
+  
+	public void printEvennNumbers() throws InterruptedException {
+		synchronized(this) {
+			for (int i = 2; i <= 100; i = i + 2) {
+				System.out.println(i);
+				Thread.sleep(500);
+				notify();
+				wait();
+			}
+		 } 
+	}
+
+	public void printOddNumbers() throws InterruptedException {
+		 synchronized(this) {
+		 for (int i = 1; i <= 100; i = i + 2) {
+				System.out.println(i);
+				Thread.sleep(500);
+				wait();
+				notify();
+			}
+		 }
+
+	}
+
+	static class EvenNumberThread extends Thread {
+
+		InterThreadCommunication itc;
+
+		EvenNumberThread(InterThreadCommunication itc) {
+			this.itc = itc;
+		}
+
+		public void run() {
+
+			try {
+				itc.printEvennNumbers();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	static class OddNumberThread extends Thread {
+
+		InterThreadCommunication itc;
+
+		OddNumberThread(InterThreadCommunication itc) {
+			this.itc = itc;
+		}
+
+		public void run() {
+			try {
+				itc.printOddNumbers();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static void main(String args[]) throws InterruptedException {
+
+		InterThreadCommunication itc = new InterThreadCommunication();
+
+		EvenNumberThread ent = new EvenNumberThread(itc);
+		OddNumberThread ont = new OddNumberThread(itc);
+
+		ont.start();
+		ent.start();
+
+	}
+
+}
